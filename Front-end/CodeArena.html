@@ -56,7 +56,7 @@
         }
 
         .home-left {
-            width: 25%;
+            width: 30%;
             background: var(--blue);
             display: flex;
             flex-direction: column;
@@ -208,9 +208,7 @@
             transform: none;
         }
 
-        /* ══════════════════════
-     QUIZ — sidebar + main
-  ══════════════════════ */
+        /*QUIZ — sidebar + main*/
         #screen-quiz {
             flex-direction: row;
         }
@@ -543,9 +541,6 @@
             gap: 8px;
         }
 
-        /* ══════════════════════
-     RESULT
-  ══════════════════════ */
         #screen-result {
             flex-direction: row;
         }
@@ -691,6 +686,77 @@
         .btn-retry:hover {
             background: var(--blue-dark);
         }
+
+        .quiz-mobile-bar {
+            display: none;
+            background: var(--blue);
+            color: #fff;
+            padding: 12px 20px;
+            gap: 20px;
+            align-items: center;
+        }
+        .mob-stat { display: flex; flex-direction: column; }
+        .mob-stat .lbl { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+        .mob-stat .val { font-size: 1.1rem; font-weight: 800; }
+        .mob-timer { margin-left: auto; font-size: 1.5rem; font-weight: 800; }
+        .mob-timer.warning { color: #fca5a5; }
+
+
+        @media (min-width: 601px) and (max-width: 1024px) {
+          .home-left { width: 40%; padding: 48px 32px; }
+          .home-left h1 { font-size: 1.8rem; letter-spacing: -1px; }
+          .home-left p { font-size: 0.88rem; }
+          .home-right { padding: 48px 36px; }
+          .quiz-sidebar { width: 200px; padding: 36px 20px; }
+          .sidebar-stat .val { font-size: 2rem; }
+          .result-left { width: 42%; padding: 48px 36px; }
+          .result-right { padding: 48px 36px; }
+
+        } 
+
+        @media (max-width: 600px) {
+            .screen { height: auto; min-height: 100vh; }
+            .home-left p { font-size: 0.85rem; line-height: 1.5; max-width: 100%; }
+            .home-left { padding: 36px 24px 32px; }
+            #screen-home { flex-direction: column; }
+            .home-left { width: 100%; padding: 40px 24px 32px; border-radius: 0 0 24px 24px; }
+            .home-left h1 { font-size: 2.4rem; }
+            .home-right { padding: 32px 24px 40px; border-radius: 0; }
+            .home-right .sub { margin-bottom: 24px; }
+            .diff-buttons { flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+
+            #screen-quiz { flex-direction: column; }
+            .quiz-sidebar { display: none; }
+            .quiz-mobile-bar { display: flex; }
+            .quiz-main { border-radius: 0; }
+            .quiz-topbar { padding: 12px 20px; border-radius: 0; }
+            .quiz-content { padding: 24px 20px; gap: 18px; }
+            .question-text { font-size: 1.15rem; }
+            .code-block { font-size: 0.8rem; padding: 14px 16px; }
+            .options { grid-template-columns: 1fr; }
+            .btn-next { width: 100%; justify-content: center; align-self: stretch; }
+
+
+            #screen-result { flex-direction: column; }
+            .result-left { width: 100%; padding: 40px 24px 36px; border-radius: 0 0 24px 24px; }
+            .result-left .score-big { font-size: 5rem; letter-spacing: -4px; }
+            .result-left .score-big span { font-size: 2.5rem; }
+            .result-right { padding: 32px 24px 40px; border-radius: 0; justify-content: flex-start; }
+        }
+
+        @media (max-width: 480px) {
+            .home-left { padding: 32px 18px 28px; }
+            .home-left h1 { font-size: 2rem; }
+            .home-right { padding: 28px 18px 36px; }
+            .quiz-content { padding: 20px 16px; }
+            .result-left { padding: 32px 18px 28px; }
+            .result-left .score-big { font-size: 4rem; }
+            .result-right { padding: 28px 18px 36px; }
+            .stat-cell { padding: 16px 10px; }
+            .stat-num { font-size: 1.6rem; }
+        }
+
     </style>
 </head>
 
@@ -728,6 +794,24 @@
 
     <!-- ══ QUIZ ══ -->
     <div id="screen-quiz" class="screen">
+
+        <!-- Mobile bar — only visible on small screens -->
+        <div class="quiz-mobile-bar">
+            <div class="mob-stat">
+                <span class="lbl">Question</span>
+                <span class="val" id="mob-q-num">1/5</span>
+            </div>
+            <div class="mob-stat">
+                <span class="lbl">Score</span>
+                <span class="val" id="mob-score">0</span>
+            </div>
+            <div class="mob-stat">
+                <span class="lbl">Level</span>
+                <span class="val" id="mob-level">—</span>
+            </div>
+            <div class="mob-timer" id="mob-timer">20</div>
+        </div>
+
         <div class="quiz-sidebar">
             <div class="logo-sm">Code<span>Arena</span></div>
 
@@ -852,20 +936,22 @@
                 text: opt,
                 isCorrect: index === q.answer
             }));
-
             options.sort(() => Math.random() - 0.5);
-
             return {
                 ...q,
                 options: options.map(o => o.text),
                 answer: options.findIndex(o => o.isCorrect)
             };
         }
+
         function startQuiz() {
-            currentQuestions = shuffle(questions[currentDiff]).slice(0, 5) .map(q => shuffleQuestion(q));
+            currentQuestions = shuffle(questions[currentDiff]).slice(0, 5).map(q => shuffleQuestion(q));
             currentIndex = 0; score = 0; timings = [];
+            const levelLabel = currentDiff.charAt(0).toUpperCase() + currentDiff.slice(1);
             document.getElementById('sidebar-score').textContent = 0;
-            document.getElementById('sidebar-level').textContent = currentDiff.charAt(0).toUpperCase() + currentDiff.slice(1);
+            document.getElementById('sidebar-level').textContent = levelLabel;
+            document.getElementById('mob-level').textContent = levelLabel;
+            document.getElementById('mob-score').textContent = 0;
             showScreen('screen-quiz');
             loadQuestion();
         }
@@ -876,6 +962,7 @@
             const timeLimit = currentDiff === 'easy' ? 20 : 15;
 
             document.getElementById('q-num').textContent = currentIndex + 1;
+            document.getElementById('mob-q-num').textContent = `${currentIndex + 1}/${total}`;
             document.getElementById('prog-label').textContent = `${currentIndex + 1} / ${total}`;
             document.getElementById('prog-pct').textContent = Math.round((currentIndex / total) * 100) + '%';
             document.getElementById('progress').style.width = `${(currentIndex / total) * 100}%`;
@@ -918,11 +1005,14 @@
         function updateTimer(t, max) {
             const num = document.getElementById('timer-num');
             const ring = document.getElementById('ring-fill');
+            const mobTimer = document.getElementById('mob-timer');
             num.textContent = t;
             const warn = t <= 5;
             num.className = 'timer-num-big' + (warn ? ' warning' : '');
             ring.className = 'ring-fill' + (warn ? ' warning' : '');
             ring.style.strokeDashoffset = CIRCUMFERENCE * (1 - t / max);
+            mobTimer.textContent = t;
+            mobTimer.className = 'mob-timer' + (warn ? ' warning' : '');
         }
 
         function selectAnswer(idx) {
@@ -932,7 +1022,11 @@
             const btns = document.querySelectorAll('.option-btn');
             btns.forEach(b => b.disabled = true);
             const isCorrect = idx === q.answer;
-            if (isCorrect) { score++; document.getElementById('sidebar-score').textContent = score; }
+            if (isCorrect) {
+                score++;
+                document.getElementById('sidebar-score').textContent = score;
+                document.getElementById('mob-score').textContent = score;
+            }
             btns[idx].classList.add(isCorrect ? 'correct' : 'wrong');
             if (!isCorrect) btns[q.answer].classList.add('correct');
             const fb = document.getElementById('feedback');
