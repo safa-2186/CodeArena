@@ -37,7 +37,7 @@
             color: var(--text);
         }
 
-        /* ── LAYOUT ── */
+        /* LAYOUT */
         .screen {
             display: none;
             height: 100vh;
@@ -48,9 +48,9 @@
             display: flex;
         }
 
-        /* ══════════════════════
-     HOME — two-column
-  ══════════════════════ */
+         /*HOME — two-column */
+
+
         #screen-home {
             flex-direction: row;
         }
@@ -208,9 +208,9 @@
             transform: none;
         }
 
-        /* ══════════════════════
-     QUIZ — sidebar + main
-  ══════════════════════ */
+      
+     /* QUIZ — sidebar + main*/
+
         #screen-quiz {
             flex-direction: row;
         }
@@ -543,9 +543,8 @@
             gap: 8px;
         }
 
-        /* ══════════════════════
-     RESULT
-  ══════════════════════ */
+        /* RESULT */
+
         #screen-result {
             flex-direction: row;
         }
@@ -696,7 +695,7 @@
 
 <body>
 
-    <!-- ══ HOME ══ -->
+    <!-- HOME -->
     <div id="screen-home" class="screen active">
         <div class="home-left">
             <span class="logo-icon"></span>
@@ -726,7 +725,7 @@
         </div>
     </div>
 
-    <!-- ══ QUIZ ══ -->
+    <!-- QUIZ -->
     <div id="screen-quiz" class="screen">
         <div class="quiz-sidebar">
             <div class="logo-sm">Code<span>Arena</span></div>
@@ -777,14 +776,14 @@
         </div>
     </div>
 
-    <!-- ══ RESULT ══ -->
+    <!-- RESULT -->
     <div id="screen-result" class="screen">
         <div class="result-left">
             <div class="res-label">Final Result</div>
             <div class="score-big" id="score-display">0<span>/5</span></div>
             <div class="score-pct" id="score-pct">0% success rate</div>
             <div class="badge-block">
-                <div class="b-icon" id="badge-icon">🏆</div>
+                <div class="b-icon" id="badge-icon"></div>
                 <div>
                     <div class="b-name" id="badge-name">Python Master</div>
                     <div class="b-desc" id="badge-desc"></div>
@@ -968,10 +967,10 @@
             document.getElementById('stat-wrong').textContent = total - score;
             document.getElementById('stat-time').textContent = avgTime + 's';
             let icon, name, desc;
-            if (pct === 100) { icon = '🏆'; name = 'Python Master'; desc = 'Perfect score — outstanding!'; }
-            else if (pct >= 80) { icon = '⚡'; name = 'Senior Developer'; desc = 'Great score, keep it up!'; }
-            else if (pct >= 60) { icon = '🔧'; name = 'In Progress'; desc = 'Good effort, keep practicing!'; }
-            else { icon = '📚'; name = 'Junior Coder'; desc = 'Review the concepts and try again!'; }
+            if (pct === 100) {name = 'Python Master'; desc = 'Perfect score — outstanding!'; }
+            else if (pct >= 80) {name = 'Senior Developer'; desc = 'Great score, keep it up!'; }
+            else if (pct >= 60) {name = 'In Progress'; desc = 'Good effort, keep practicing!'; }
+            else {name = 'Junior Coder'; desc = 'Review the concepts and try again!'; }
             document.getElementById('badge-icon').textContent = icon;
             document.getElementById('badge-name').textContent = name;
             document.getElementById('badge-desc').textContent = desc;
