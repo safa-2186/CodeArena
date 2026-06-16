@@ -901,23 +901,8 @@
 
 
     <script>
-        let countdownPlayed = false;
-        const questions = {
-            easy: [
-                { type: "MCQ", text: "What is the correct syntax to define a function in Python?", options: ["function myFunc():", "def myFunc():", "define myFunc():", "func myFunc():"], answer: 1, explanation: "In Python, the def keyword is used to declare a function." },
-                { type: "True / False", text: "In Python, lists are mutable (can be modified after creation).", options: ["True", "False"], answer: 0, explanation: "Python lists are mutable — you can modify them using .append(), .remove(), etc." },
-                { type: "MCQ", text: "What does len([1, 2, 3, 4]) return?", options: ["3", "4", "5", "Error"], answer: 1, explanation: "len() returns the number of elements. [1, 2, 3, 4] contains 4 elements." },
-                { type: "MCQ", text: "Which data type stores key/value pairs in Python?", options: ["list", "tuple", "dict", "set"], answer: 2, explanation: "A dictionary (dict) stores key-value pairs. Example: {'name': 'Alice'}." },
-                { type: "True / False", text: "A for loop in Python can iterate directly over a string.", options: ["True", "False"], answer: 0, explanation: "Strings are iterable in Python. for c in 'abc': loops over each character." }
-            ],
-            medium: [
-                { type: "MCQ", code: "def mystery(lst):\n    return [x for x in lst if x % 2 == 0]", text: "What does this function do?", options: ["Returns odd elements", "Returns even elements", "Returns True if all are even", "Raises an error"], answer: 1, explanation: "The list comprehension filters elements where x % 2 == 0, keeping only even numbers." },
-                { type: "MCQ", text: "What is the average time complexity of a lookup in a Python dictionary?", options: ["O(n)", "O(log n)", "O(1)", "O(n²)"], answer: 2, explanation: "Python dicts use a hash table, giving O(1) average-case lookup time." },
-                { type: "True / False", code: "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(len(a))", text: "This code prints 4.", options: ["True", "False"], answer: 0, explanation: "b = a does not copy the list — both variables point to the same object. Modifying b also modifies a." },
-                { type: "MCQ", text: "Which data structure is best suited for a FIFO queue?", options: ["list (append/pop)", "deque (collections)", "dict", "set"], answer: 1, explanation: "collections.deque is optimized for O(1) insertions and deletions at both ends." },
-                { type: "MCQ", code: "def fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)", text: "What is the value of fact(4)?", options: ["12", "24", "16", "Recursion Error"], answer: 1, explanation: "fact(4) = 4 × 3 × 2 × 1 = 24. This is a recursive factorial function." }
-            ]
-        };
+
+        const API = 'http://localhost:3000';
 
         let currentDiff = null, currentQuestions = [], currentIndex = 0, score = 0;
         let timerInterval = null, timeLeft = 20, timings = [], questionStartTime = 0;
@@ -930,31 +915,31 @@
             document.getElementById('btn-start').disabled = false;
         }
 
-        function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
-        function shuffleQuestion(q) {
-            const options = q.options.map((opt, index) => ({
-                text: opt,
-                isCorrect: index === q.answer
-            }));
-            options.sort(() => Math.random() - 0.5);
-            return {
-                ...q,
-                options: options.map(o => o.text),
-                answer: options.findIndex(o => o.isCorrect)
-            };
+
+        async function startQuiz() {
+            const btn = document.getElementById('btn-start');
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            try {
+               const res = await fetch(`${API}/api/questions?difficulty=${currentDiff}`);
+               if (!res.ok) throw new Error('Failed to fetch questions');
+               currentQuestions = await res.json();
+
+               currentIndex = 0; score = 0; timings = [];
+               document.getElementById('sidebar-score').textContent = 0;
+               document.getElementById('sidebar-level').textContent = currentDiff.charAt(0).toUpperCase() + currentDiff.slice(1);
+
+               showScreen('screen-quiz');
+               loadQuestion();
+
+            }  catch (err) {
+               alert('Could not connect to the server. Is the backend running?');
+               btn.disabled = false;
+               btn.textContent = 'Start Quiz →';
+            }
         }
 
-        function startQuiz() {
-            currentQuestions = shuffle(questions[currentDiff]).slice(0, 5).map(q => shuffleQuestion(q));
-            currentIndex = 0; score = 0; timings = [];
-            const levelLabel = currentDiff.charAt(0).toUpperCase() + currentDiff.slice(1);
-            document.getElementById('sidebar-score').textContent = 0;
-            document.getElementById('sidebar-level').textContent = levelLabel;
-            document.getElementById('mob-level').textContent = levelLabel;
-            document.getElementById('mob-score').textContent = 0;
-            showScreen('screen-quiz');
-            loadQuestion();
-        }
 
         function loadQuestion() {
             const q = currentQuestions[currentIndex];
@@ -1052,10 +1037,23 @@
             else showResults();
         }
 
-        function showResults() {
+        async function showResults() {
             const total = currentQuestions.length;
             const pct = Math.round((score / total) * 100);
             const avgTime = Math.round(timings.reduce((a, b) => a + b, 0) / timings.length);
+
+            try {
+
+              await fetch(`${API}/api/scores`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ score, total, difficulty: currentDiff })
+              }); 
+
+            } catch (err) {
+                console.warn('Score not saved :', err.message);
+            }
+
             document.getElementById('score-display').innerHTML = `${score}<span>/${total}</span>`;
             document.getElementById('score-pct').textContent = `${pct}% success rate`;
             document.getElementById('stat-correct').textContent = score;
@@ -1076,6 +1074,7 @@
             currentDiff = null;
             document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('btn-start').disabled = true;
+            document.getElementById('btn-start').textContent = 'Start Quiz →';
             showScreen('screen-home');
         }
 
