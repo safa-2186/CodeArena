@@ -6,7 +6,7 @@ router.get('/', async (req, res) => {
     try {
         const { difficulty } = req.query;
 
-        let query = 'SELECT score, total, difficulty, percentage, created_at FROM scores';
+        let query = 'SELECT score, total, difficulty, percentage FROM scores';
         const params = [];
  
         if (difficulty && ['easy', 'medium'].includes(difficulty)) {
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
             params.push(difficulty);
         }
 
-        query += ' ORDER BY percentage DESC, created_at ASC LIMIT 10';
+        query += ' ORDER BY percentage DESC LIMIT 10';
 
         const [rows] = await pool.query(query, params);
 
