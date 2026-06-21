@@ -18,10 +18,10 @@ An interactive,timed quiz application that tests Python and algorithm knowledge 
 
 ## Tech stack
 
-Frontend : HTML, CSS, JavaScript
-Backend  : Node.js, Express
-Database : MySQL
-Hosting  : 
+- Frontend : HTML, CSS, JavaScript
+- Backend  : Node.js, Express
+- Database : MySQL
+- Hosting  : 
 
 
 ## Project structure
@@ -31,12 +31,12 @@ CodeArena/
 │── Front-end/
 │   └── index.html
 │── db/
-│   |── pool.js
+│   │── pool.js
 │   └── seed.js
 │── routes/
-│   |── questions.js
-│   |── scores.js
-|   └── leaderboard.js 
+│   │── questions.js
+│   │── scores.js
+│   └── leaderboard.js 
 │── server.js
 │── .env.example
 │── .gitignore
