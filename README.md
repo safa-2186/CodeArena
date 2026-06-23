@@ -21,7 +21,13 @@ An interactive,timed quiz application that tests Python and algorithm knowledge 
 - Frontend : HTML, CSS, JavaScript
 - Backend  : Node.js, Express
 - Database : MySQL
-- Hosting  : 
+- Hosting  : Netlify (frontend), Railway (backend + database)
+
+
+## Live demo
+
+- Frontend : https://codearena-quiz.netlify.app/
+- Backend : https://codearena-production-c2c1.up.railway.app
 
 
 ## Project structure
@@ -120,3 +126,17 @@ The API will be running at http://localhost:3000.
 ## API reference
 
 
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/questions?difficulty=easy` | Returns 5 random questions for the given difficulty, with shuffled answer options |
+| POST | `/api/scores` | Saves a completed quiz score `{ score, total, difficulty }` |
+| GET | `/api/leaderboard?difficulty=easy` | Returns the top 10 scores |
+
+
+
+## Team
+
+- Laila
+- Hafssa
+- Safa
+- Adam
